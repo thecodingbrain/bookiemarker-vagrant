@@ -154,7 +154,7 @@
       shell: nohup python3 manage.py runserver 0.0.0.0:8000
       args:
           chdir: "{{ codingbrain_dir }}"
-      async: 10
+      async: 40
       poll: 0
       become_user: vagrant
       
