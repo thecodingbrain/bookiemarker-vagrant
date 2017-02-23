@@ -11,7 +11,6 @@
     rabbitmq_user: "user"
     rabbitmq_password: "password"
     codingbrain_dir: /home/codingbrain
-    source_dir: /vagrant/code
     pg_version: 9.4
     pg_conf: "/etc/postgresql/{{ pg_version }}/main/postgresql.conf"
     pg_hba: "/etc/postgresql/{{ pg_version}}/main/pg_hba.conf"
@@ -144,42 +143,29 @@
       args:
         chdir: "{{ codingbrain_dir }}" 
       
+    - name: install gunicorn
+      shell: pip3 install gunicorn
+      args:
+        chdir: "{{ codingbrain_dir }}" 
+
     - name: migrate codingbrain app
       shell: nohup python3 manage.py migrate
       args:
           chdir: "{{ codingbrain_dir }}"
       become_user: vagrant
-            
-    - name: run codingbrain app
-      shell: nohup python3 manage.py runserver 0.0.0.0:8000
-      args:
-          chdir: "{{ codingbrain_dir }}"
-      async: 40
-      poll: 0
-      become_user: vagrant
       
-    - name: clone frontend soure
-      git:
-        repo: https://github.com/thecodingbrain/webscraper-microservices-frontend.git
-        dest: "{{ source_dir }}/frontend"
-      become_user: vagrant
-    
-    - name: clone backend soure
-      git:
-        repo: https://github.com/thecodingbrain/webscraper-microservices-backend.git
-        dest: "{{ source_dir }}/backend"
-      become_user: vagrant
-        
-    - name: clone worker soure
-      git:
-        repo: https://github.com/thecodingbrain/webscraper-microservices-worker.git
-        dest: "{{ source_dir }}/worker"
-      become_user: vagrant
-
-            
+    - name: setup gunicorn
+      template:
+        src: templates/gunicorn.conf.j2
+        dest: /etc/init/gunicorn.conf
+      notify: restart gunicorn
+                        
   handlers:
     - name: restart nginx
       service: name=nginx state=restarted
       
     - name: restart postgresql
       service: name=postgresql state=restarted
+      
+    - name: restart gunicorn
+      service: name=gunicorn state=started
