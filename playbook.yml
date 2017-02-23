@@ -1,0 +1,185 @@
+---
+- name: Setup webscraper environment
+  hosts: all
+  vars:
+    locale: en_US.UTF-8
+    database_name: "scrapingservicedb"
+    database_user: "root"
+    database_password: "root"
+    database_host: localhost
+    database_port: 15432
+    rabbitmq_user: "user"
+    rabbitmq_password: "password"
+    codingbrain_dir: /home/codingbrain
+    source_dir: /vagrant/code
+    pg_version: 9.4
+    pg_conf: "/etc/postgresql/{{ pg_version }}/main/postgresql.conf"
+    pg_hba: "/etc/postgresql/{{ pg_version}}/main/pg_hba.conf"
+  
+  become: True  
+  tasks:
+    # install packages
+    - name: add rabbit mq apt repository
+      apt_repository:
+        repo: "deb http://www.rabbitmq.com/debian/ testing main"
+        state: present
+        filename: "rabbitmq.list"
+
+    - name: add postges apt repository
+      apt_repository:
+        repo: "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main"
+        state: present
+        filename: "pgdg.list"
+
+    - name: add python 3.6 apt repository
+      apt_repository:
+        repo: "ppa:jonathonf/python-3.6"
+        state: present
+
+    - name: add pgdg repo key
+      apt_key:
+        url: "https://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc"
+        state: present
+              
+    - name: add rabbitmq key
+      apt_key:
+        url: "https://www.rabbitmq.com/rabbitmq-release-signing-key.asc"
+        state: present
+          
+    - name: apt update & upgrade
+      apt: 
+        update_cache: yes 
+        upgrade: yes
+
+    - name: install apt packages
+      apt: 
+        pkg: "{{ item }}" 
+        update_cache: yes 
+        cache_valid_time: 3600 
+      with_items:
+        - nginx
+        - postgresql-{{ pg_version }}
+        - rabbitmq-server
+        - python-psycopg2
+        - erlang-nox
+        - rabbitmq-server
+        - git
+        - python3.6
+        - python3-pip
+        
+    # -- nginx     
+    - name: set the nginx config file
+      template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/sites-available/default
+      notify: restart nginx
+
+    - name: enable the nginx config file
+      file:
+        src: /etc/nginx/sites-available/default
+        dest: /etc/nginx/sites-enabled/default
+        state: link
+      notify: restart nginx
+
+    # -- postgres   
+    - name: configure postgres listen to *
+      lineinfile: 
+        dest: "{{ pg_conf }}" 
+        regexp: "#listen_addresses = 'localhost'"
+        line: "listen_addresses = '*'"
+      notify: restart postgresql
+        
+    - name: Append to pg_hba.conf to add password auth
+      copy:
+        dest: "{{ pg_hba }}"
+        content: |
+          host  all all all md5
+      notify: restart postgresql
+                          
+    - name: create a user
+      postgresql_user:
+        name: "{{ database_user }}"
+        password: "{{ database_password }}"
+      become_user: postgres
+      
+    - name: create the database
+      postgresql_db:
+        name: "{{ database_name }}"
+        owner: "{{ database_user }}"
+        encoding: UTF8
+        lc_ctype: "{{ locale }}"
+        lc_collate: "{{ locale }}"
+        template: template0
+      become_user: postgres
+
+    # -- rabbitmq     
+    - name: add rabbitmq user
+      rabbitmq_user:
+        user: "{{ rabbitmq_user }}"
+        password: "{{ rabbitmq_password }}"
+        permissions:
+          - vhost: /
+            configure_priv: .*
+            read_priv: .*
+            write_priv: .*
+        state: present
+        
+    # Python
+    # Codingbrain app
+    - name: create codingbrain dir
+      file:
+        path: "{{ codingbrain_dir }}"
+        group: vagrant
+        owner: vagrant
+        state: directory
+    
+    - name: clone git repo
+      git:
+          repo: https://github.com/thecodingbrain/webscraper-microservices-codingbrain.git
+          dest: "{{ codingbrain_dir }}"
+      become_user: vagrant
+          
+    - name: install requirements
+      shell: pip3 install -r requirements.txt
+      args:
+        chdir: "{{ codingbrain_dir }}" 
+      
+    - name: migrate codingbrain app
+      shell: nohup python3 manage.py migrate
+      args:
+          chdir: "{{ codingbrain_dir }}"
+      become_user: vagrant
+            
+    - name: run codingbrain app
+      shell: nohup python3 manage.py runserver 0.0.0.0:8000
+      args:
+          chdir: "{{ codingbrain_dir }}"
+      async: 10
+      poll: 0
+      become_user: vagrant
+      
+    - name: clone frontend soure
+      git:
+        repo: https://github.com/thecodingbrain/webscraper-microservices-frontend.git
+        dest: "{{ source_dir }}/frontend"
+      become_user: vagrant
+    
+    - name: clone backend soure
+      git:
+        repo: https://github.com/thecodingbrain/webscraper-microservices-backend.git
+        dest: "{{ source_dir }}/backend"
+      become_user: vagrant
+        
+    - name: clone worker soure
+      git:
+        repo: https://github.com/thecodingbrain/webscraper-microservices-worker.git
+        dest: "{{ source_dir }}/worker"
+      become_user: vagrant
+
+            
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+      
+    - name: restart postgresql
+      service: name=postgresql state=restarted
