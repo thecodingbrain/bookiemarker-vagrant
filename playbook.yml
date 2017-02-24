@@ -135,7 +135,7 @@
     
     - name: clone git repo
       git:
-          repo: https://github.com/thecodingbrain/webscraper-microservices-codingbrain.git
+          repo: https://BernhardWenzel@bitbucket.org/BernhardWenzel/codingbrain-webscraper-course.git
           dest: "{{ codingbrain_dir }}"
       become_user: vagrant
           
