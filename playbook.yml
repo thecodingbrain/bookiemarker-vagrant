@@ -177,11 +177,21 @@
         src: templates/codingbrain.conf.j2
         dest: /etc/init/codingbrain.conf
       notify: restart codingbrain
+
+    - name: install backend service
+      template:
+        src: templates/backend.conf.j2
+        dest: /etc/init/backend.conf
+
+    - name: install worker service
+      template:
+        src: templates/worker.conf.j2
+        dest: /etc/init/worker.conf
       
     - name: install worker requirements
       shell: pip3 install -r worker-requirements.txt
       args:
-        chdir: "vagrant/files" 
+        chdir: "/vagrant/files" 
       become: True
 
                         
