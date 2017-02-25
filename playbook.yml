@@ -31,6 +31,16 @@
         state: present
         filename: "pgdg.list"
 
+    - name: add gradle 3.3 apt repository
+      apt_repository:
+        repo: "ppa:cwchien/gradle"
+        state: present
+
+    - name: add java 8 apt repository
+      apt_repository:
+        repo: "ppa:webupd8team/java"
+        state: present
+
     - name: add python 3.6 apt repository
       apt_repository:
         repo: "ppa:jonathonf/python-3.6"
@@ -51,6 +61,9 @@
         update_cache: yes 
         upgrade: yes
 
+    - name: Automatically select the Oracle License
+      shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+
     - name: install apt packages
       apt: 
         pkg: "{{ item }}" 
@@ -66,6 +79,8 @@
         - git
         - python3.6
         - python3-pip
+        - gradle-3.3
+        - oracle-java8-installer
         
     # -- nginx     
     - name: set the nginx config file
@@ -157,9 +172,9 @@
       
     - name: setup gunicorn
       template:
-        src: templates/gunicorn.conf.j2
-        dest: /etc/init/gunicorn.conf
-      notify: restart gunicorn
+        src: templates/codingbrain.conf.j2
+        dest: /etc/init/codingbrain.conf
+      notify: restart codingbrain
                         
   handlers:
     - name: restart nginx
@@ -168,5 +183,5 @@
     - name: restart postgresql
       service: name=postgresql state=restarted
       
-    - name: restart gunicorn
-      service: name=gunicorn state=started
+    - name: restart codingbrain
+      service: name=codingbrain state=started
