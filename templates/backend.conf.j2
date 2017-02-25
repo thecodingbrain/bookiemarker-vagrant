@@ -1,0 +1,10 @@
+description "Backend process"
+
+manual
+
+respawn
+setuid vagrant
+setgid vagrant
+chdir {{ codingbrain_dir }}/backend
+
+exec gradle run
