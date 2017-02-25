@@ -81,8 +81,8 @@
         - python3-pip
         - gradle-3.3
         - oracle-java8-installer
-        - libxml2-dev
-        - libxslt1-dev
+        - python-numpy
+        - python-lxml
         
     # -- nginx     
     - name: set the nginx config file
@@ -177,6 +177,13 @@
         src: templates/codingbrain.conf.j2
         dest: /etc/init/codingbrain.conf
       notify: restart codingbrain
+      
+    - name: install worker requirements
+      shell: pip3 install -r worker-requirements.txt
+      args:
+        chdir: "vagrant/files" 
+      become: True
+
                         
   handlers:
     - name: restart nginx
