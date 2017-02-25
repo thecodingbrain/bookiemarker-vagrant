@@ -81,6 +81,8 @@
         - python3-pip
         - gradle-3.3
         - oracle-java8-installer
+        - libxml2-dev
+        - libxslt1-dev
         
     # -- nginx     
     - name: set the nginx config file
