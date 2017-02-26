@@ -198,7 +198,6 @@
       shell: pip3 install -r worker-requirements.txt
       args:
         chdir: "/vagrant/files" 
-      become: True
 
                         
   handlers:
