@@ -89,7 +89,6 @@
         - python-dev
         - python-numpy
         - python-lxml
-        - language-pack-UTF-8
         
     # -- nginx     
     - name: set the nginx config file
