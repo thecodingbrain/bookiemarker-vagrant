@@ -81,6 +81,10 @@
         - python3-pip
         - gradle-3.3
         - oracle-java8-installer
+        - libxml2-dev 
+        - libxslt1-dev
+        - zlib1g-dev 
+        - python-dev
         - python-numpy
         - python-lxml
         
