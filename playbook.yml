@@ -12,6 +12,8 @@
     rabbitmq_password: "password"
     codingbrain_dir: /home/codingbrain
     frontend_dir: /vagrant/frontend
+    backend_dir: /vagrant/backend
+    worker_dir: /vagrant/worker
     pg_version: 9.4
     pg_conf: "/etc/postgresql/{{ pg_version }}/main/postgresql.conf"
     pg_hba: "/etc/postgresql/{{ pg_version}}/main/pg_hba.conf"
@@ -87,6 +89,7 @@
         - python-dev
         - python-numpy
         - python-lxml
+        - language-pack-UTF-8
         
     # -- nginx     
     - name: set the nginx config file
