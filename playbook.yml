@@ -202,7 +202,7 @@
         chdir: "/vagrant/files" 
 
     - name: Get the nltk tokenizers
-      shell: "python3 -c \"import nltk; nltk.download('punkt')\""
+      shell: 'python3 -c "import nltk; nltk.download('punkt')"'
                         
   handlers:
     - name: restart nginx
