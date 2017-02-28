@@ -165,6 +165,11 @@
       args:
         chdir: "{{ codingbrain_dir }}" 
       
+    - name: install worker requirements
+      shell: pip3 install -r worker-requirements.txt
+      args:
+        chdir: "/vagrant/files" 
+
     - name: install gunicorn
       shell: pip3 install gunicorn
       args:
@@ -176,6 +181,9 @@
           chdir: "{{ codingbrain_dir }}"
       become_user: vagrant
       
+    - name: Get the nltk tokenizers
+      shell: python3 -c "import nltk; nltk.download('punkt')"
+                                
     - name: setup gunicorn
       template:
         src: templates/codingbrain.conf.j2
@@ -192,14 +200,6 @@
         src: templates/worker.conf.j2
         dest: /etc/init/worker.conf
       
-    - name: install worker requirements
-      shell: pip3 install -r worker-requirements.txt
-      args:
-        chdir: "/vagrant/files" 
-
-    - name: Get the nltk tokenizers
-      shell: python3 -c "import nltk; nltk.download('punkt')"
-                            
 
   handlers:
     - name: restart nginx
