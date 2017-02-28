@@ -69,8 +69,6 @@
     - name: install apt packages
       apt: 
         pkg: "{{ item }}" 
-        update_cache: yes 
-        cache_valid_time: 3600 
       with_items:
         - nginx
         - postgresql-{{ pg_version }}
@@ -87,10 +85,8 @@
         - libxslt1-dev
         - zlib1g-dev 
         - python-dev
-        - python-numpy
         - python-lxml
         - python-numpy 
-        - python-nltk
         
     # -- nginx     
     - name: set the nginx config file
@@ -175,7 +171,7 @@
         chdir: "{{ codingbrain_dir }}" 
 
     - name: migrate codingbrain app
-      shell: nohup python3 manage.py migrate
+      shell: python3 manage.py migrate
       args:
           chdir: "{{ codingbrain_dir }}"
       become_user: vagrant
@@ -202,8 +198,9 @@
         chdir: "/vagrant/files" 
 
     - name: Get the nltk tokenizers
-      shell: 'python3 -c "import nltk; nltk.download('punkt')"'
-                        
+      shell: python3 -c "import nltk; nltk.download('punkt')"
+                            
+
   handlers:
     - name: restart nginx
       service: name=nginx state=restarted
