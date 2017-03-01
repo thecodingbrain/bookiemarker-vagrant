@@ -198,9 +198,16 @@
       args:
         chdir: "/vagrant/files" 
 
-    - name: open browser
-      command: python3 -m webbrowser -t "http://localhost:5000"                            
+    - name: Get the nltk tokenizers
+      command: python3 -c "import nltk; nltk.download('punkt')"
+                                    
 
   handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+      
+    - name: restart postgresql
+      service: name=postgresql state=restarted
+      
     - name: restart codingbrain
       service: name=codingbrain state=started
