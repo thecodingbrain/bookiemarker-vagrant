@@ -157,7 +157,7 @@
     
     - name: clone git repo
       git:
-          repo: https://BernhardWenzel@bitbucket.org/BernhardWenzel/codingbrain-webscraper-course.git
+          repo: https://BernhardWenzel@bitbucket.org/BernhardWenzel/codingbrain-full-stack-course.git
           dest: "{{ codingbrain_dir }}"
       become_user: vagrant
           
@@ -200,7 +200,17 @@
 
     - name: Get the nltk tokenizers
       command: python3 -c "import nltk; nltk.download('punkt')"
-                                    
+      
+    - name: clone backend soure to install maven dependencies
+      git:
+        repo: https://github.com/thecodingbrain/full-stack-crash-course-backend.git
+        dest: "{{ backend_dir }}"
+        force: yes
+        
+    - name: start backend and install dependencies
+      shell: gradle compileJava 
+      args: 
+        chdir: "{{ backend_dir }}"
 
   handlers:
     - name: restart nginx

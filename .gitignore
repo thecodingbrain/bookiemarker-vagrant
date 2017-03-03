@@ -1,5 +1,8 @@
+.gradle
 .vagrant
 *.box
 frontend/*
+backend/*
+worker/*
 *.retry
 code/
