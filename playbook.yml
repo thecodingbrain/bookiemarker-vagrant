@@ -203,7 +203,7 @@
       
     - name: clone backend soure to install maven dependencies
       git:
-        repo: https://github.com/thecodingbrain/full-stack-crash-course-backend.git
+        repo: https://github.com/thecodingbrain/bookiemarker-backend.git
         dest: "{{ backend_dir }}"
         force: yes
         
