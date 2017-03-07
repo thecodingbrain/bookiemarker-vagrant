@@ -157,7 +157,7 @@
     
     - name: clone git repo
       git:
-          repo: https://BernhardWenzel@bitbucket.org/BernhardWenzel/codingbrain-full-stack-course.git
+          repo: https://BernhardWenzel@bitbucket.org/BernhardWenzel/codingbrain-bookiemarker.git
           dest: "{{ codingbrain_dir }}"
       become_user: vagrant
           
