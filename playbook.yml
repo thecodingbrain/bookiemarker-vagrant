@@ -3,13 +3,16 @@
   hosts: all
   vars:
     locale: en_US.UTF-8
-    database_name: "scrapingservicedb"
+    database_name: "bookiemarkerdb"
     database_user: "root"
     database_password: "root"
     database_host: localhost
-    database_port: 15432
+    database_port: 7232
     rabbitmq_user: "user"
     rabbitmq_password: "password"
+    rabbitmq_port: 7234
+    rabbitmq_management_port: 7235
+    rabbitmq_config_dir: "/etc/rabbitmq"
     codingbrain_dir: /home/codingbrain
     frontend_dir: /vagrant/frontend
     backend_dir: /vagrant/backend
@@ -110,6 +113,13 @@
         line: "listen_addresses = '*'"
       notify: restart postgresql
         
+    - name: configure postgres port
+      lineinfile: 
+        dest: "{{ pg_conf }}" 
+        regexp: "port = 5432"
+        line: "port = {{ database_port }}"
+      notify: restart postgresql
+        
     - name: Append to pg_hba.conf to add password auth
       copy:
         dest: "{{ pg_hba }}"
@@ -145,6 +155,12 @@
             read_priv: .*
             write_priv: .*
         state: present
+        
+    - name: configure rabbitmq
+      template:
+        src: templates/rabbitmq.config.j2
+        dest: "{{ rabbitmq_config_dir}}/rabbitmq.config"
+      notify: restart rabbitmq
         
     # Python
     # Codingbrain app
@@ -219,5 +235,8 @@
     - name: restart postgresql
       service: name=postgresql state=restarted
       
+    - name: restart rabbitmq
+      service: name=rabbitmq-server state=restarted
+        
     - name: restart codingbrain
       service: name=codingbrain state=started

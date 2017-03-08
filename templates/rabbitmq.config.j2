@@ -1,0 +1,4 @@
+[
+    {rabbit, [{tcp_listeners, [{{ rabbitmq_port }}]}]},
+    {rabbitmq_management, [{listener, [{port, {{ rabbitmq_management_port }}}]}]},
+].

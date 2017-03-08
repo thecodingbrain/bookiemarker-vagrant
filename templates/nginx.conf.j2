@@ -1,6 +1,6 @@
 server {
-        listen 80 default_server;
-        listen [::]:80 default_server ipv6only=on;
+        listen 7230 default_server;
+        listen [::]:7230 default_server ipv6only=on;
 
         root {{ frontend_dir }};
         index index.html index.htm;

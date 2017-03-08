@@ -8,4 +8,4 @@ setuid vagrant
 setgid vagrant
 chdir {{ codingbrain_dir }}
 
-exec gunicorn --workers 3 --bind 0.0.0.0:8000 config.wsgi:application
+exec gunicorn --workers 3 --bind 0.0.0.0:7220 config.wsgi:application
