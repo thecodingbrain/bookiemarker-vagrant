@@ -85,11 +85,11 @@
         - gradle-3.3
         - oracle-java8-installer
         - libxml2-dev 
-        - libxslt1-dev
+        - libxslt-dev
+        - libjpeg-dev 
         - zlib1g-dev 
+        - libpng12-dev        
         - python-dev
-        - python-lxml
-        - python-numpy 
         
     # -- nginx     
     - name: set the nginx config file
@@ -177,7 +177,7 @@
           dest: "{{ codingbrain_dir }}"
       become_user: vagrant
           
-    - name: install requirements
+    - name: install CodingBrainTutor requirements
       shell: pip3 install -r requirements.txt
       args:
         chdir: "{{ codingbrain_dir }}" 
@@ -204,19 +204,26 @@
         src: templates/backend.conf.j2
         dest: /etc/init/backend.conf
 
-    - name: install worker service
+    - name: worker - install service
       template:
         src: templates/worker.conf.j2
         dest: /etc/init/worker.conf
       
-    - name: install worker requirements
+    - name: worker - install requirements
       shell: pip3 install -r worker-requirements.txt
       args:
         chdir: "/vagrant/files" 
 
-    - name: Get the nltk tokenizers
-      command: python3 -c "import nltk; nltk.download('punkt')"
+    - name: worker - download nlp corpora script
+      get_url: 
+          url: https://raw.githubusercontent.com/codelucas/newspaper/master/download_corpora.py
+          dest: "{{ codingbrain_dir }}"
       
+    - name: worker - download nlp corpora
+      shell: python3 download_corpora.py
+      args:
+          chdir: "{{ codingbrain_dir }}"
+            
     - name: clone backend soure to install maven dependencies
       git:
         repo: https://github.com/thecodingbrain/bookiemarker-backend.git
