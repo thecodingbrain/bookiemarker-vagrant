@@ -1,5 +1,5 @@
 ---
-- name: Setup webscraper environment
+- name: Setup bookiemarker environment
   hosts: all
   vars:
     locale: en_US.UTF-8
@@ -85,7 +85,7 @@
         - gradle-3.3
         - oracle-java8-installer
         - libxml2-dev 
-        - libxslt-dev
+        - libxslt1-dev
         - libjpeg-dev 
         - zlib1g-dev 
         - libpng12-dev        
