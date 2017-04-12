@@ -164,42 +164,42 @@
         
     # Python
     # Codingbrain app
-    - name: create codingbrain dir
+    - name: codingbraintutor - create codingbrain dir
       file:
         path: "{{ codingbrain_dir }}"
         group: vagrant
         owner: vagrant
         state: directory
     
-    - name: clone git repo
+    - name: codingbraintutor - clone git repo
       git:
           repo: https://BernhardWenzel@bitbucket.org/BernhardWenzel/codingbrain-bookiemarker.git
           dest: "{{ codingbrain_dir }}"
       become_user: vagrant
           
-    - name: install CodingBrainTutor requirements
+    - name: codingbraintutor - install requirements
       shell: pip3 install -r requirements.txt
       args:
         chdir: "{{ codingbrain_dir }}" 
       
-    - name: install gunicorn
+    - name: codingbraintutor - install gunicorn
       shell: pip3 install gunicorn
       args:
         chdir: "{{ codingbrain_dir }}" 
 
-    - name: migrate codingbrain app
+    - name: codingbraintutor - migrate codingbrain app
       shell: python3 manage.py migrate
       args:
           chdir: "{{ codingbrain_dir }}"
       become_user: vagrant
       
-    - name: setup gunicorn
+    - name: codingbraintutor - setup gunicorn
       template:
         src: templates/codingbrain.conf.j2
         dest: /etc/init/codingbrain.conf
       notify: restart codingbrain
 
-    - name: install backend service
+    - name: backend - install backend service
       template:
         src: templates/backend.conf.j2
         dest: /etc/init/backend.conf
