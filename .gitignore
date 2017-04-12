@@ -3,6 +3,7 @@
 *.box
 frontend/*
 backend/*
+backend
 worker/*
 *.retry
 code/
