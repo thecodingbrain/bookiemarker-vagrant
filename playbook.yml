@@ -156,6 +156,7 @@
             configure_priv: .*
             read_priv: .*
             write_priv: .*
+        tags: administrator
         state: present
         
     - name: configure rabbitmq
@@ -163,6 +164,9 @@
         src: templates/rabbitmq.config.j2
         dest: "{{ rabbitmq_config_dir}}/rabbitmq.config"
       notify: restart rabbitmq
+      
+    - name: enable rabbitmq admin
+      shell: rabbitmq-plugins enable rabbitmq_management
         
     # Python
     # Codingbrain app
