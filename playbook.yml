@@ -24,7 +24,6 @@
     pg_hba: "/etc/postgresql/{{ pg_version}}/main/pg_hba.conf"
     environment_config:
       LC_ALL: "{{ locale }}"
-      PS1: "$(pwd)$ "
       
   become: True  
   tasks:
@@ -102,8 +101,14 @@
       locale_gen: 
         name: "{{ locale }}"
         state: present
+        
+    # change ubuntu prompt
+    - name: configure prompt
+      blockinfile:
+          block: "PS1='$(pwd)$ '"
+          dest: "/home/vagrant/.bashrc"
           
-  # -- nginx     
+    # -- nginx     
     - name: set the nginx config file
       template:
         src: templates/nginx.conf.j2
