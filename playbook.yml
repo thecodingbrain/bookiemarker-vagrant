@@ -1,6 +1,8 @@
 ---
 - name: Setup bookiemarker environment
   hosts: all
+  roles:
+    - franklinkim.environment 
   vars:
     locale: en_US.UTF-8
     database_name: "bookiemarkerdb"
@@ -20,7 +22,10 @@
     pg_version: 9.4
     pg_conf: "/etc/postgresql/{{ pg_version }}/main/postgresql.conf"
     pg_hba: "/etc/postgresql/{{ pg_version}}/main/pg_hba.conf"
-  
+    environment_config:
+      LC_ALL: "{{ locale }}"
+      PS1: "$(pwd)$ "
+      
   become: True  
   tasks:
     # install packages
@@ -90,10 +95,15 @@
         - zlib1g-dev 
         - libpng12-dev        
         - python-dev
-        - python3-lxml
         - python-numpy 
         
-    # -- nginx     
+    # generate locale
+    - name: Install locale
+      locale_gen: 
+        name: "{{ locale }}"
+        state: present
+          
+  # -- nginx     
     - name: set the nginx config file
       template:
         src: templates/nginx.conf.j2
